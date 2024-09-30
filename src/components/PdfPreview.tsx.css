@@ -1,0 +1,44 @@
+.page-sheet {
+  position: relative;
+  background: #fff;
+  /* background-clip: content-box; */
+  /* magrin: 8px auto; */
+  /* border: 9px solid transparent; */
+  /* margin: 1px auto -8px; */
+}
+
+.page-filler {
+  display: flex;
+  justify-content: center;
+}
+
+.page-message-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  z-index: 1;
+}
+
+.page-message-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #000a;
+  height: 100%;
+}
+
+.page-error, .page-loading {
+  text-align: center;
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+}
+
+.pdf-scrollview {
+  height: 75vh;
+}
