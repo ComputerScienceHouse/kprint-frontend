@@ -4,11 +4,12 @@ import {
   PDFDocumentProxy,
   PDFPageProxy,
 } from "pdfjs-dist";
-import {Button} from "reactstrap";
+import {Input, Button} from "reactstrap";
 import AutoSizer from "react-virtualized-auto-sizer";
 import {VariableSizeList} from "react-window";
 import {useMemo, useState, useEffect, useRef} from "react";
 import {useConstCallback} from "powerhooks";
+import {UserPageSelectionSet, setContainsPage} from "../PageSelectionSet";
 import "./PdfPreview.tsx.css";
 import PdfJsWorker from "pdfjs-dist/build/pdf.worker?worker&url";
 
@@ -27,6 +28,12 @@ function PdfPage({
     scale: number;
     maxWidth: number;
     colorMode: "grayscale" | "color";
+    setPageIncluded: (
+      page: number,
+      included: boolean,
+      pdfPageCount: number,
+    ) => unknown;
+    pagesIncluded: UserPageSelectionSet;
   };
   index: number;
   style: Object;
@@ -35,6 +42,7 @@ function PdfPage({
   const scale = data.scale;
   const maxWidth = data.maxWidth;
   const colorMode = data.colorMode;
+  const pagesIncluded = data.pagesIncluded;
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -80,10 +88,26 @@ function PdfPage({
     };
   }, [contextRef.current, page, scale]);
 
+  const includedInSelection = setContainsPage(
+    pagesIncluded.validSet,
+    index + 1,
+  );
+
+  const onPageSelectionChanged = useConstCallback((event) => {
+    data.setPageIncluded(
+      index + 1,
+      event.target.checked,
+      data.pdfDocument.numPages,
+    );
+  });
+
   return (
     <div className="page" style={style}>
-      <div className="page-container">
-        <div className="page-filler" style={{width: maxWidth + "px"}}>
+      <div
+        className="page-container"
+        style={{width: maxWidth + "px", minWidth: maxWidth + "px"}}
+      >
+        <div className="page-filler">
           <div className="page-sheet">
             <div className="page-message-overlay">
               {renderOutcome.state != "finished" && (
@@ -99,6 +123,14 @@ function PdfPage({
                   )}
                 </div>
               )}
+            </div>
+            <div className="page-selection">
+              <Input
+                type="checkbox"
+                checked={includedInSelection}
+                onChange={onPageSelectionChanged}
+                disabled={pagesIncluded.text != pagesIncluded.validSet}
+              />
             </div>
             <canvas
               ref={canvasRef}
@@ -119,16 +151,27 @@ function PdfPage({
   );
 }
 
-type PdfControls = {
-  zoom: (amount: number | "reset") => unknown;
+export type PdfControls = {
+  zoom?: (amount: number | "reset") => unknown;
+  documentTitle?: string | null;
 };
 
 export function PdfPreview({
   pdfBlob,
   colorMode,
+  pagesIncluded,
+  pdfControls,
+  setPageIncluded,
 }: {
   pdfBlob: File;
   colorMode: "color" | "grayscale";
+  pagesIncluded: UserPageSelectionSet;
+  pdfControls: PdfControls;
+  setPageIncluded: (
+    page: number,
+    included: boolean,
+    pdfPageCount: number,
+  ) => unknown;
 }) {
   const [documentState, setDocumentState] = useState<
     {pdfDocument: PDFDocumentProxy; pages: PDFPageProxy[]} | undefined
@@ -164,15 +207,14 @@ export function PdfPreview({
     };
   }, [pdfBlob]);
 
-  const pdfControls = useRef<PdfControls>({});
   const increaseZoom = useConstCallback(() => {
-    pdfControls.current?.zoom(0.1);
+    pdfControls.zoom?.(0.1);
   });
   const reduceZoom = useConstCallback(() => {
-    pdfControls.current?.zoom(-0.1);
+    pdfControls.zoom?.(-0.1);
   });
   const resetZoom = useConstCallback(() => {
-    pdfControls.current?.zoom("reset");
+    pdfControls.zoom?.("reset");
   });
 
   if (!documentState) {
@@ -194,8 +236,10 @@ export function PdfPreview({
               pages={documentState.pages}
               height={height}
               width={width}
-              pdfControls={pdfControls.current}
+              pdfControls={pdfControls}
               colorMode={colorMode}
+              setPageIncluded={setPageIncluded}
+              pagesIncluded={pagesIncluded}
             />
           )}
         </AutoSizer>
@@ -211,6 +255,8 @@ export function PdfPreviewInner({
   height,
   pdfControls,
   colorMode,
+  pagesIncluded,
+  setPageIncluded,
 }: {
   pdfDocument: PDFDocumentProxy;
   pages: PDFPageProxy[];
@@ -218,7 +264,25 @@ export function PdfPreviewInner({
   height: number;
   pdfControls: PdfControls;
   colorMode: "grayscale" | "color";
+  pagesIncluded: UserPageSelectionSet;
+  setPageIncluded: (
+    page: number,
+    included: boolean,
+    pdfPageCount: number,
+  ) => unknown;
 }) {
+  useEffect(() => {
+    let cancelled = false;
+    pdfDocument.getMetadata().then((metadata) => {
+      if (!cancelled) {
+        const title = metadata.metadata.get("dc:title");
+        pdfControls.documentTitle = typeof title == "string" ? title : null;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pdfDocument]);
   const computeDefaultScale = () => {
     const maxWidth = pages.reduce(
       (accumulator, page) =>
@@ -230,7 +294,7 @@ export function PdfPreviewInner({
         Math.max(accumulator, page.getViewport({scale: 1.0}).height),
       0,
     );
-    return Math.min(width / maxWidth, height / maxHeight);
+    return Math.min((width - 64) / maxWidth, (height - 64) / maxHeight);
   };
   pdfControls.zoom = useConstCallback((delta: number | "reset") => {
     if (delta == "reset") {
@@ -254,7 +318,8 @@ export function PdfPreviewInner({
       ),
     [pages, scale],
   );
-  const listRef = useRef();
+  // Listen... I'm not proud of it...
+  const listRef = useRef<any>(null);
   useEffect(() => {
     listRef.current?.resetAfterIndex?.(0);
   }, [scale]);
@@ -263,7 +328,7 @@ export function PdfPreviewInner({
   const estimatedItemSize = useMemo(
     () =>
       pages.reduce(
-        (accumulator, page, index) => getPageSize(index) + accumulator,
+        (accumulator, _page, index) => getPageSize(index) + accumulator,
         0,
       ) / pages.length,
     [scale, pages],
@@ -275,7 +340,15 @@ export function PdfPreviewInner({
       width={width}
       itemCount={pdfDocument.numPages}
       itemSize={getPageSize}
-      itemData={{pdfDocument, pages, scale, maxWidth, colorMode}}
+      itemData={{
+        pdfDocument,
+        pages,
+        scale,
+        maxWidth,
+        colorMode,
+        setPageIncluded,
+        pagesIncluded,
+      }}
       estimatedItemSize={estimatedItemSize}
       ref={listRef}
     >

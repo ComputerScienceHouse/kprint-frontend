@@ -20,7 +20,7 @@ const NavBar: React.FunctionComponent = () => {
 
   return (
     <div>
-      <Navbar color="primary" dark expand="lg" fixed="top">
+      <Navbar color="primary" dark expand="lg">
         <Container>
           <NavLink to="/" className={"navbar-brand"}>
             CSH React Boilerplate

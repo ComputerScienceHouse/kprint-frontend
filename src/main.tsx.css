@@ -19,3 +19,21 @@ code {
   color: unset;
   padding: unset;
 }
+
+html, body, #root, .page-and-navbar {
+  height: 100%;
+}
+
+.page-and-navbar {
+  display: flex;
+  flex-flow: column;
+}
+
+.main {
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.main-child {
+  height: 100%;
+}

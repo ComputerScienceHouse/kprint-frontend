@@ -6,7 +6,6 @@ import {
 } from "reactstrap";
 
 import React from "react";
-import {useOidc, useOidcAccessToken, useOidcIdToken} from "@axa-fr/react-oidc";
 import UserInfo from "../UserInfo";
 import {SSOEnabled} from "../configuration";
 import {
@@ -14,12 +13,10 @@ import {
   getUseOidcHook,
   NoSSOProfilePicture,
   NoSSOUserInfo,
-  useOidcAccessTokenNoSSO,
-  useOidcNoSSO,
 } from "../SSODisabledDefaults";
 
 const Profile: React.FunctionComponent = () => {
-  const {login, logout, isAuthenticated} = getUseOidcHook()();
+  const {logout} = getUseOidcHook()();
   const {accessTokenPayload} = getUseOidcAccessToken()();
   const userInfo = SSOEnabled
     ? (accessTokenPayload as UserInfo)

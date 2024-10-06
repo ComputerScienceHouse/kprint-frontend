@@ -7,10 +7,10 @@ type Props = {
 
 export default function PageContainer({children}: Props) {
   return (
-    <div style={{marginTop: "90px"}}>
+    <div className="page-and-navbar">
+      <NavBar />
       <Container className="main" fluid>
-        <NavBar />
-        <Container>{children}</Container>
+        <Container className="main-child">{children}</Container>
       </Container>
     </div>
   );
