@@ -16,7 +16,7 @@ const oidcConfig: OidcConfiguration = {
   refresh_time_before_tokens_expiration_in_second: 10,
 };
 
-export const apiPrefix = "http://localhost:8080";
+export const apiPrefix = import.meta.env.VITE_API_PREFIX;
 
 export const SSOEnabled =
   (import.meta.env.VITE_SSO_ENABLED ?? "true") === "true";
