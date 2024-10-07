@@ -23,7 +23,7 @@ const NavBar: React.FunctionComponent = () => {
       <Navbar color="primary" dark expand="lg">
         <Container>
           <NavLink to="/" className={"navbar-brand"}>
-            CSH React Boilerplate
+            kPrint
           </NavLink>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>

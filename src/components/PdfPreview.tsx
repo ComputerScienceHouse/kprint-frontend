@@ -224,9 +224,9 @@ export function PdfPreview({
   return (
     <div className="pdf-preview">
       <div className="pdf-toolbar">
-        <Button onClick={increaseZoom}>+</Button>
         <Button onClick={reduceZoom}>-</Button>
         <Button onClick={resetZoom}>Reset Zoom</Button>
+        <Button onClick={increaseZoom}>+</Button>
       </div>
       <div className="pdf-scrollview">
         <AutoSizer>

@@ -54,3 +54,13 @@
   flex: 1 1 auto;
   height: 100%;
 }
+
+.pdf-toolbar {
+  display: flex;
+  justify-content: center;
+  margin: 1em;
+}
+
+.pdf-toolbar button {
+  margin: 0 0.5em;
+}
