@@ -32,6 +32,8 @@ import "./Home.tsx.css";
 
 type SuccessReply = {
   message: string;
+  job_link: string | null;
+  job_id: number | null;
 };
 
 const Home = () => {
@@ -42,7 +44,7 @@ const Home = () => {
   // const { login, logout, isAuthenticated } = useOidc()  // this gets the functions to login and logout and the logout state
 
   const {fetch} = useOidcFetch();
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<SuccessReply | null>(null);
 
   const pdfControls = useRef<PdfControls>({});
 
@@ -63,7 +65,7 @@ const Home = () => {
     ).then(async (res) => {
       if (res.ok) {
         const json = (await res.json()) as SuccessReply;
-        setMessage(json.message);
+        setMessage(json);
       } else {
         console.log("failure", res, await res.text());
       }
@@ -128,7 +130,7 @@ const Home = () => {
         )}
       </div>
       <div className="form-pane">
-        {message && <Alert>{message}</Alert>}
+        {message && <Alert>{message.message} <a href={message.job_link!!}>View Job {message.job_id!!}</a></Alert>}
         <Form onSubmit={onSubmit}>
           <FormGroup>
             <Label for="file">File</Label>
