@@ -55,7 +55,7 @@ const Home = () => {
     console.log(file);
 
     fetch(
-      `${apiPrefix}/printers/Cinnabar/print?${new URLSearchParams(formData as any)}`,
+      `${apiPrefix}/printers/${import.meta.env.VITE_PRINTER}/print?${new URLSearchParams(formData as any)}`,
       {
         method: "POST",
         body: file,
