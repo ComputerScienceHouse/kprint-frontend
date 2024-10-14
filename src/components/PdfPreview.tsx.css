@@ -30,7 +30,8 @@
   height: 100%;
 }
 
-.page-error, .page-loading {
+.page-error,
+.page-loading {
   text-align: center;
 }
 

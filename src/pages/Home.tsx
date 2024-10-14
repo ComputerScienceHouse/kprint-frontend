@@ -130,7 +130,12 @@ const Home = () => {
         )}
       </div>
       <div className="form-pane">
-        {message && <Alert>{message.message} <a href={message.job_link!!}>View Job {message.job_id!!}</a></Alert>}
+        {message && (
+          <Alert>
+            {message.message}{" "}
+            <a href={message.job_link!!}>View Job {message.job_id!!}</a>
+          </Alert>
+        )}
         <Form onSubmit={onSubmit}>
           <FormGroup>
             <Label for="file">File</Label>
