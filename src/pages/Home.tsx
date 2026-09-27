@@ -188,7 +188,7 @@ const Home = () => {
                 name="file"
                 type="file"
                 onChange={onFileSelected}
-                accept=".pdf,.png,.jpg,.jpeg"
+                accept=".pdf"
                 className="file-input-hidden"
                 required
               />
