@@ -34,9 +34,21 @@
   width: 50%;
 }
 
+.title {
+  font-size: 16;
+  font-weight: 500;
+  text-decoration: underline;
+}
 .input-container {
   display: flex;
   align-items: center;
+}
+
+.input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  color: var(--text);
 }
 .input-label {
   margin-bottom: 0;
@@ -116,7 +128,7 @@
   width: 1.75rem;
   height: 1rem;
   padding: 0;
-
+  color: var(--text);
   border: none;
   background: transparent;
   cursor: pointer;

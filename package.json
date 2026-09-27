@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@axa-fr/react-oidc": "^7.22.29",
-    "@tailwindcss/vite": "^4.3.3",
     "csh-material-bootstrap": "^4.6.2",
     "material-icons": "^1.13.12",
     "pdfjs-dist": "^4.6.82",
@@ -23,8 +22,7 @@
     "react-router-dom": "^6.26.2",
     "react-virtualized-auto-sizer": "^1.0.24",
     "react-window": "^1.8.10",
-    "reactstrap": "^9.2.3",
-    "tailwindcss": "^4.3.3"
+    "reactstrap": "^9.2.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

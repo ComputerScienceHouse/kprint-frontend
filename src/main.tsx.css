@@ -1,6 +1,4 @@
-@import "tailwindcss";
-
-@theme {
+#root {
   --color-brand-orange: #ff9800;
   --color-brand-primary: #b0197e;
 }

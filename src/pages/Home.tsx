@@ -168,7 +168,7 @@ const Home = () => {
           </Alert>
         )}
         <Form onSubmit={onSubmit}>
-          <h1 className="text-3xl underline">Print</h1>
+          <h1 className="title">Print</h1>
           <FormGroup className="input-container">
             <Label for="file" className="input-label">
               File
@@ -198,7 +198,7 @@ const Home = () => {
             <Label for="sides" className="input-label">
               Sides
             </Label>
-            <Input id="sides" name="sides" type="select" className="w-full">
+            <Input id="sides" name="sides" type="select" className="input">
               <option value="one-sided">Single Sided</option>
               <option value="two-sided-long-edge">
                 Long Edge Double Sided
@@ -218,7 +218,7 @@ const Home = () => {
               type="select"
               value={colorMode}
               onChange={onColorChange}
-              className="w-full input"
+              className="input"
             >
               <option value="color">Color</option>
               <option value="grayscale">Black + White</option>
@@ -229,7 +229,7 @@ const Home = () => {
               Copies
             </Label>
 
-            <div className="number-input w-full">
+            <div className="number-input input">
               <Input
                 id="copies"
                 name="copies"
@@ -237,7 +237,7 @@ const Home = () => {
                 value={copies}
                 min={1}
                 onChange={(e) => setCopies(Number(e.target.value))}
-                className="w-full input"
+                className="input"
               />
 
               <div className="number-controls">
@@ -266,7 +266,7 @@ const Home = () => {
               invalid={pagesIncluded.text != pagesIncluded.validSet}
               onChange={onPagesIncludedChanged}
               placeholder="e.g. 1-5, 8, 11-13"
-              className="w-full"
+              className="input"
             />
           </FormGroup>
 
