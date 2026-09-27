@@ -6,25 +6,29 @@ import {
 } from "reactstrap";
 
 import React from "react";
-import UserInfo from "../UserInfo";
-import {SSOEnabled} from "../configuration";
+import { SSOEnabled } from "../configuration";
 import {
   getUseOidcAccessToken,
   getUseOidcHook,
   NoSSOProfilePicture,
   NoSSOUserInfo,
 } from "../SSODisabledDefaults";
+import UserInfo from "../UserInfo";
 
 const Profile: React.FunctionComponent = () => {
-  const {logout} = getUseOidcHook()();
-  const {accessTokenPayload} = getUseOidcAccessToken()();
+  const { logout } = getUseOidcHook()();
+  const { accessTokenPayload } = getUseOidcAccessToken()();
   const userInfo = SSOEnabled
     ? (accessTokenPayload as UserInfo)
     : NoSSOUserInfo;
 
   return (
     <UncontrolledDropdown nav inNavbar>
-      <DropdownToggle nav caret className="navbar-user">
+      <DropdownToggle
+        nav
+        caret
+        className="navbar-user d-flex align-items-center"
+      >
         <img
           className="rounded-circle"
           src={

@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   Collapse,
   Container,
@@ -7,7 +8,6 @@ import {
   NavbarToggler,
   NavItem,
 } from "reactstrap";
-import {NavLink} from "react-router-dom";
 import Profile from "./Profile";
 import ThemeToggle from "./ThemeToggle";
 

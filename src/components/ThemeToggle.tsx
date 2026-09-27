@@ -1,6 +1,6 @@
-import {useEffect, useState} from "react";
-import {useConstCallback} from "powerhooks";
-import {Helmet} from "react-helmet-async";
+import { useConstCallback } from "powerhooks";
+import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 const darkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -8,7 +8,7 @@ export default function ThemeToggle() {
   const [darkMode, setDarkMode] = useState(() => darkQuery().matches);
   useEffect(() => {
     const query = darkQuery();
-    const onMediaChange = (event: {matches: boolean}) => {
+    const onMediaChange = (event: { matches: boolean }) => {
       setDarkMode(event.matches);
     };
     onMediaChange(query);
@@ -24,15 +24,15 @@ export default function ThemeToggle() {
   return (
     <>
       <Helmet>
-        <body className={darkMode ? "dark-theme" : undefined} />
+        <body className={darkMode ? "dark-theme" : "light-theme"} />
       </Helmet>
       <button
-        style={{width: "32px", height: "32px"}}
+        style={{ width: "32px", height: "32px" }}
         onClick={onThemeToggle}
         className="icon-button"
         role="toggle"
       >
-        <span className="material-icons-outlined" style={{fontSize: "32px"}}>
+        <span className="material-icons-outlined" style={{ fontSize: "32px" }}>
           {darkMode ? "dark_mode" : "light_mode"}
         </span>
       </button>

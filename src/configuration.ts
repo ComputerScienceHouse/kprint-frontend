@@ -1,4 +1,4 @@
-import {OidcConfiguration} from "@axa-fr/react-oidc";
+import { OidcConfiguration } from "@axa-fr/react-oidc";
 
 const oidcConfig: OidcConfiguration = {
   client_id: import.meta.env.VITE_SSO_CLIENT_ID ?? "test",
@@ -18,7 +18,6 @@ const oidcConfig: OidcConfiguration = {
 
 export const apiPrefix = import.meta.env.VITE_API_PREFIX;
 
-export const SSOEnabled =
-  (import.meta.env.VITE_SSO_ENABLED ?? "true") === "true";
-
+export const SSOEnabled = import.meta.env.VITE_SSO_ENABLED === "true";
+console.log(import.meta.env.VITE_SSO_ENABLED);
 export default oidcConfig;
