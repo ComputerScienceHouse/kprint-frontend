@@ -1,16 +1,8 @@
-import {
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  UncontrolledDropdown,
-} from "reactstrap";
-
 import React from "react";
 import { SSOEnabled } from "../configuration";
 import {
   getUseOidcAccessToken,
   getUseOidcHook,
-  NoSSOProfilePicture,
   NoSSOUserInfo,
 } from "../SSODisabledDefaults";
 import UserInfo from "../UserInfo";
@@ -23,36 +15,45 @@ const Profile: React.FunctionComponent = () => {
     : NoSSOUserInfo;
 
   return (
-    <UncontrolledDropdown nav inNavbar>
-      <DropdownToggle
-        nav
-        caret
-        className="navbar-user d-flex align-items-center"
-      >
-        <img
-          className="rounded-circle"
-          src={
-            SSOEnabled
-              ? `https://profiles.csh.rit.edu/image/${userInfo.preferred_username}`
-              : NoSSOProfilePicture
-          }
-          alt=""
-          aria-hidden={true}
-          width={32}
-          height={32}
-        />
-        ({userInfo.preferred_username})
-        <span className="caret" />
-      </DropdownToggle>
-      <DropdownMenu>
-        {
-          // to add stuff to the profile dropdown, you can
-        }
-        <DropdownItem href="https://members.csh.rit.edu">Members</DropdownItem>
-        <DropdownItem divider />
-        <DropdownItem onClick={() => logout(null)}>Logout</DropdownItem>
-      </DropdownMenu>
-    </UncontrolledDropdown>
+    <ul className="nav navbar-nav ml-auto">
+      <li className="nav-item navbar-user dropdown">
+        <a
+          className="nav-link dropdown-toggle"
+          data-bs-toggle="dropdown"
+          href="#"
+          type="button"
+          id="user02"
+          aria-expanded="true"
+        >
+          <img
+            className="rounded-circle"
+            src={
+              SSOEnabled
+                ? `https://profiles.csh.rit.edu/image/${userInfo.preferred_username}`
+                : "./no-sso-profile-picture.png"
+            }
+            alt=""
+            aria-hidden="true"
+            width={32}
+            height={32}
+          />{" "}
+          Testing Tester
+          <span className="caret"></span>
+        </a>
+        <div className="dropdown-menu" aria-labelledby="user02">
+          <a className="dropdown-item" href="#">
+            Profile
+          </a>
+          <a className="dropdown-item" href="#">
+            Settings
+          </a>
+          <div className="dropdown-divider"></div>
+          <a className="dropdown-item" href="#">
+            Logout
+          </a>
+        </div>
+      </li>
+    </ul>
   );
 };
 

@@ -6,11 +6,9 @@ type Props = {
 
 export default function PageContainer({ children }: Props) {
   return (
-    <div className="page-and-navbar">
+    <div className="page-and-navbar ">
       <NavBar />
-      {/* <Container className="main" fluid>
-        <Container className="main-child">{children}</Container>
-      </Container> */}
+
       {children}
     </div>
   );

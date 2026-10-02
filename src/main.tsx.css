@@ -1,17 +1,9 @@
 #root {
   --color-brand-orange: #ff9800;
   --color-brand-primary: #b0197e;
+  --bs-body-bg: transparent;
 }
 
-.dark-theme * {
-  --secondary: rgb(69, 69, 69);
-  --text: #fff;
-}
-
-.light-theme * {
-  --secondary: #ddd;
-  --text: #000;
-}
 body {
   margin: 0;
   font-family:
@@ -20,6 +12,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* .dark-theme * {
+  --background: #222222;
+  --secondary: rgb(69, 69, 69);
+  --text: #fff;
+}
+.light-theme * {
+  --background: #eeeeee;
+  --secondary: #dddddd;
+  --text: #000;
+} */
 
 code {
   font-family:

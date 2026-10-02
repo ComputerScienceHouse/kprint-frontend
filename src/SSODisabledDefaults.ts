@@ -1,6 +1,5 @@
 // if your app requires SSO you can delete this page
 import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
-import NoSSOProfilePicture from "./assets/no-sso-profile-picture.png";
 import { SSOEnabled } from "./configuration";
 
 import UserInfo from "./UserInfo";
@@ -46,8 +45,6 @@ export const NoSSOUserInfo: UserInfo = {
   email: "baz@csh.rit.edu",
   uuid: "",
 };
-
-export { NoSSOProfilePicture };
 
 export const getUseOidcHook = () => {
   return SSOEnabled ? useOidc : useOidcNoSSO;
