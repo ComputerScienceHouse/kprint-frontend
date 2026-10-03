@@ -1,17 +1,17 @@
 import * as pdfjsLib from "pdfjs-dist";
 import {
-  RenderingCancelledException,
   PDFDocumentProxy,
   PDFPageProxy,
+  RenderingCancelledException,
 } from "pdfjs-dist";
-import {Input, Button} from "reactstrap";
-import AutoSizer from "react-virtualized-auto-sizer";
-import {VariableSizeList} from "react-window";
-import {useMemo, useState, useEffect, useRef} from "react";
-import {useConstCallback} from "powerhooks";
-import {UserPageSelectionSet, setContainsPage} from "../PageSelectionSet";
-import "./PdfPreview.tsx.css";
 import PdfJsWorker from "pdfjs-dist/build/pdf.worker?worker&url";
+import { useConstCallback } from "powerhooks";
+import { useEffect, useMemo, useRef, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { VariableSizeList } from "react-window";
+import { Button, Input } from "reactstrap";
+import { UserPageSelectionSet, setContainsPage } from "../PageSelectionSet";
+import "./PdfPreview.tsx.css";
 
 const PADDING_BETWEEN_PAGES = 8 + 8;
 
@@ -53,16 +53,16 @@ function PdfPage({
   }, [canvasRef.current]);
 
   const outputScale = window.devicePixelRatio || 1;
-  const viewport = page.getViewport({scale});
+  const viewport = page.getViewport({ scale });
   const [renderOutcome, setRenderOutcome] = useState<
-    {state: "pending" | "finished"} | {state: "error"; error: any}
-  >({state: "pending"});
+    { state: "pending" | "finished" } | { state: "error"; error: any }
+  >({ state: "pending" });
 
   useEffect(() => {
     if (!contextRef.current) {
       return;
     }
-    setRenderOutcome({state: "pending"});
+    setRenderOutcome({ state: "pending" });
     const transform =
       outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : undefined;
     const renderTask = page.render({
@@ -77,10 +77,10 @@ function PdfPage({
           return;
         }
         console.error(`Rendering page ${index} failed`, error);
-        setRenderOutcome({state: "error", error});
+        setRenderOutcome({ state: "error", error });
       })
       .then(() => {
-        setRenderOutcome({state: "finished"});
+        setRenderOutcome({ state: "finished" });
       });
     return () => {
       cancelled = true;
@@ -105,10 +105,16 @@ function PdfPage({
     <div className="page" style={style}>
       <div
         className="page-container"
-        style={{width: maxWidth + "px", minWidth: maxWidth + "px"}}
+        style={{ width: maxWidth + "px", minWidth: maxWidth + "px" }}
       >
         <div className="page-filler">
-          <div className="page-sheet">
+          <div
+            className={
+              includedInSelection
+                ? "page-sheet"
+                : "page-sheet page-sheet-unselected"
+            }
+          >
             <div className="page-message-overlay">
               {renderOutcome.state != "finished" && (
                 <div className="page-message-container">
@@ -129,7 +135,8 @@ function PdfPage({
                 type="checkbox"
                 checked={includedInSelection}
                 onChange={onPageSelectionChanged}
-                disabled={pagesIncluded.text != pagesIncluded.validSet}
+                disabled={pagesIncluded.text !== pagesIncluded.validSet}
+                className="page-checkbox"
               />
             </div>
             <canvas
@@ -174,8 +181,10 @@ export function PdfPreview({
   ) => unknown;
 }) {
   const [documentState, setDocumentState] = useState<
-    {pdfDocument: PDFDocumentProxy; pages: PDFPageProxy[]} | undefined
+    { pdfDocument: PDFDocumentProxy; pages: PDFPageProxy[] } | undefined
   >();
+  const previewRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     setDocumentState(undefined);
     let cancellation = () => loadingTask.destroy();
@@ -207,6 +216,30 @@ export function PdfPreview({
     };
   }, [pdfBlob]);
 
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+
+    const handleWheel = (event: WheelEvent) => {
+      // Trackpad pinch is generally reported as ctrl + wheel
+      if (!event.ctrlKey) return;
+
+      event.preventDefault();
+
+      const zoomAmount = -event.deltaY * 0.005;
+      pdfControls.zoom?.(zoomAmount);
+    };
+
+    preview.addEventListener("wheel", handleWheel, {
+      passive: false,
+    });
+
+    return () => {
+      console.log("Removing wheel listner");
+      preview.removeEventListener("wheel", handleWheel);
+    };
+  }, [documentState, pdfControls]);
+
   const increaseZoom = useConstCallback(() => {
     pdfControls.zoom?.(0.1);
   });
@@ -222,15 +255,10 @@ export function PdfPreview({
   }
 
   return (
-    <div className="pdf-preview">
-      <div className="pdf-toolbar">
-        <Button onClick={reduceZoom}>-</Button>
-        <Button onClick={resetZoom}>Reset Zoom</Button>
-        <Button onClick={increaseZoom}>+</Button>
-      </div>
+    <div className="pdf-preview" ref={previewRef}>
       <div className="pdf-scrollview">
         <AutoSizer>
-          {({height, width}) => (
+          {({ height, width }) => (
             <PdfPreviewInner
               pdfDocument={documentState.pdfDocument}
               pages={documentState.pages}
@@ -243,6 +271,31 @@ export function PdfPreview({
             />
           )}
         </AutoSizer>
+      </div>
+      <div className="pdf-toolbar">
+        <Button
+          className="toolbar-button"
+          onClick={reduceZoom}
+          title="Zoom out"
+        >
+          <span className="material-icons">zoom_out</span>
+        </Button>
+
+        <Button
+          className="toolbar-button"
+          onClick={resetZoom}
+          title="Reset zoom"
+        >
+          <span className="material-icons">fit_screen</span>
+        </Button>
+
+        <Button
+          className="toolbar-button"
+          onClick={increaseZoom}
+          title="Zoom in"
+        >
+          <span className="material-icons">zoom_in</span>
+        </Button>
       </div>
     </div>
   );
@@ -286,12 +339,12 @@ export function PdfPreviewInner({
   const computeDefaultScale = () => {
     const maxWidth = pages.reduce(
       (accumulator, page) =>
-        Math.max(accumulator, page.getViewport({scale: 1.0}).width),
+        Math.max(accumulator, page.getViewport({ scale: 1.0 }).width),
       0,
     );
     const maxHeight = pages.reduce(
       (accumulator, page) =>
-        Math.max(accumulator, page.getViewport({scale: 1.0}).height),
+        Math.max(accumulator, page.getViewport({ scale: 1.0 }).height),
       0,
     );
     return Math.min((width - 64) / maxWidth, (height - 64) / maxHeight);
@@ -300,20 +353,20 @@ export function PdfPreviewInner({
     if (delta == "reset") {
       setScale(computeDefaultScale());
     } else {
-      setScale((scale) => scale + delta);
+      setScale((scale) => Math.min(Math.max(scale + delta, 0.25), 3));
     }
   });
   const [scale, setScale] = useState(computeDefaultScale);
 
   const getPageSize = useConstCallback((index: number) => {
-    const viewport = pages[index].getViewport({scale});
+    const viewport = pages[index].getViewport({ scale });
     return viewport.height + PADDING_BETWEEN_PAGES;
   });
   const maxWidth = useMemo(
     () =>
       pages.reduce(
         (accumulator, page) =>
-          Math.max(accumulator, page.getViewport({scale}).width),
+          Math.max(accumulator, page.getViewport({ scale }).width),
         0,
       ),
     [pages, scale],

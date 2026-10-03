@@ -1,38 +1,28 @@
-import {useEffect, useState} from "react";
-import {useConstCallback} from "powerhooks";
-import {Helmet} from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 
-const darkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
+interface ThemeToggleProps {
+  darkMode: boolean;
+  onThemeToggle: () => void;
+}
 
-export default function ThemeToggle() {
-  const [darkMode, setDarkMode] = useState(() => darkQuery().matches);
-  useEffect(() => {
-    const query = darkQuery();
-    const onMediaChange = (event: {matches: boolean}) => {
-      setDarkMode(event.matches);
-    };
-    onMediaChange(query);
-    return () => {
-      query.removeEventListener("change", onMediaChange);
-    };
-  }, []);
-
-  const onThemeToggle = useConstCallback(() => {
-    setDarkMode((darkMode) => !darkMode);
-  });
-
+export default function ThemeToggle({
+  darkMode,
+  onThemeToggle,
+}: ThemeToggleProps) {
   return (
     <>
       <Helmet>
-        <body className={darkMode ? "dark-theme" : undefined} />
+        <body data-bs-theme={darkMode ? "dark" : "light"} />
       </Helmet>
+
       <button
-        style={{width: "32px", height: "32px"}}
+        style={{ width: "32px", height: "48px" }}
         onClick={onThemeToggle}
         className="icon-button"
-        role="toggle"
+        type="button"
+        aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
-        <span className="material-icons-outlined" style={{fontSize: "32px"}}>
+        <span className="material-icons-outlined" style={{ fontSize: "32px" }}>
           {darkMode ? "dark_mode" : "light_mode"}
         </span>
       </button>

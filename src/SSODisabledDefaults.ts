@@ -1,7 +1,8 @@
 // if your app requires SSO you can delete this page
+import { useOidc, useOidcAccessToken } from "@axa-fr/react-oidc";
+import { SSOEnabled } from "./configuration";
+
 import UserInfo from "./UserInfo";
-import {useOidc, useOidcAccessToken} from "@axa-fr/react-oidc";
-import {SSOEnabled} from "./configuration";
 
 export const useOidcNoSSO = () => {
   return {
@@ -13,7 +14,7 @@ export const useOidcNoSSO = () => {
 };
 
 export const useOidcAccessTokenNoSSO = () => {
-  return {accessTokenPayload: ""};
+  return { accessTokenPayload: "" };
 };
 
 export const NoSSOUserInfo: UserInfo = {
@@ -44,9 +45,6 @@ export const NoSSOUserInfo: UserInfo = {
   email: "baz@csh.rit.edu",
   uuid: "",
 };
-
-export const NoSSOProfilePicture =
-  "https://cdn.discordapp.com/attachments/719366780606480384/1035722437049982986/csh.png";
 
 export const getUseOidcHook = () => {
   return SSOEnabled ? useOidc : useOidcNoSSO;

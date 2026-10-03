@@ -4,29 +4,21 @@ import {
   // useOidcIdToken,
   useOidcFetch,
 } from "@axa-fr/react-oidc";
-import {useConstCallback} from "powerhooks";
-import {
-  Alert,
-  Form,
-  FormGroup,
-  Input,
-  Button,
-  FormText,
-  Label,
-} from "reactstrap";
-import {useState, useRef} from "react";
+import { useConstCallback } from "powerhooks";
+import { useRef, useState } from "react";
+import { Alert, Button, Form, FormGroup, Input, Label } from "reactstrap";
 // import {Link} from "react-router-dom";
 // import Authenticating from "../callbacks/Authenticating";
 // import AuthenticationError from "../callbacks/AuthenticationError";
 // import SessionLost from "../callbacks/SessionLost";
 // import UserInfo from "../UserInfo";
-import {apiPrefix} from "../configuration";
-import {PdfControls, PdfPreview} from "../components/PdfPreview";
+import { PdfControls, PdfPreview } from "../components/PdfPreview";
+import { apiPrefix } from "../configuration";
 import {
   UserPageSelectionSet,
   addPageToSet,
-  setContainsPage,
   removePageFromSet,
+  setContainsPage,
 } from "../PageSelectionSet";
 import "./Home.tsx.css";
 
@@ -43,8 +35,12 @@ const Home = () => {
   // const { idToken, idTokenPayload } = useOidcIdToken()  // this is how you get the users id token
   // const { login, logout, isAuthenticated } = useOidc()  // this gets the functions to login and logout and the logout state
 
-  const {fetch} = useOidcFetch();
+  const { fetch } = useOidcFetch();
   const [message, setMessage] = useState<SuccessReply | null>(null);
+  const [copies, setCopies] = useState(1);
+
+  const [pdfWidth, setPdfWidth] = useState(60);
+  const splitterRef = useRef<HTMLDivElement | null>(null);
 
   const pdfControls = useRef<PdfControls>({});
 
@@ -55,7 +51,6 @@ const Home = () => {
     formData.delete("file");
     formData.append("title", pdfControls.current?.documentTitle ?? file!!.name);
     console.log(file);
-
     fetch(
       `${apiPrefix}/printers/${import.meta.env.VITE_PRINTER}/print?${new URLSearchParams(formData as any)}`,
       {
@@ -111,15 +106,41 @@ const Home = () => {
         const newSetText = included
           ? addPageToSet(set.text, page)
           : removePageFromSet(set.text, page, pdfPageCount);
-        return {text: newSetText, validSet: newSetText};
+        return { text: newSetText, validSet: newSetText };
       });
     },
   );
 
+  //IDK I was bored. Allows user to resize pdfviewer and form pane
+
+  const startResizing = (event: React.MouseEvent) => {
+    event.preventDefault();
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!splitterRef.current) return;
+
+      const rect = splitterRef.current.getBoundingClientRect();
+
+      const newWidth = ((event.clientX - rect.left) / rect.width) * 100;
+
+      const clampedWidth = Math.min(Math.max(newWidth, 30), 80);
+
+      setPdfWidth(clampedWidth);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
   return (
-    <div className="pane-splitter">
-      <div className="pdf-pane">
-        {file && (
+    <div className="pane-splitter" ref={splitterRef}>
+      <div className="pdf-pane" style={{ width: `${pdfWidth}%` }}>
+        {file ? (
           <PdfPreview
             pdfBlob={file}
             pdfControls={pdfControls.current}
@@ -127,9 +148,19 @@ const Home = () => {
             pagesIncluded={pagesIncluded}
             setPageIncluded={setPageIncluded}
           />
+        ) : (
+          <div className="pdf-empty">
+            <span className="material-icons pdf-empty-icon">description</span>
+
+            <h5>No file selected</h5>
+            <p>Select a file to see a preview before printing.</p>
+          </div>
         )}
       </div>
-      <div className="form-pane">
+
+      <div className="pane-resizer" onMouseDown={startResizing} />
+
+      <div className="form-pane" style={{ width: `${100 - pdfWidth}%` }}>
         {message && (
           <Alert>
             {message.message}{" "}
@@ -137,54 +168,96 @@ const Home = () => {
           </Alert>
         )}
         <Form onSubmit={onSubmit}>
-          <FormGroup>
-            <Label for="file">File</Label>
-            <Input
-              id="file"
-              name="file"
-              type="file"
-              onChange={onFileSelected}
-              required
-            />
-            <FormText>Document you'd like to print</FormText>
+          <h1 className="title">Print</h1>
+          <FormGroup className="input-container">
+            <Label for="file" className="input-label">
+              File
+            </Label>
+
+            <div className="custom-file-input">
+              <Label for="file" className="file-button">
+                Select File
+              </Label>
+
+              <span className="file-name">
+                {file ? file.name : "Select a file to print"}
+              </span>
+
+              <Input
+                id="file"
+                name="file"
+                type="file"
+                onChange={onFileSelected}
+                accept=".pdf"
+                className="file-input-hidden"
+                required
+              />
+            </div>
           </FormGroup>
-          <FormGroup>
-            <Label for="sides">Double-Sided</Label>
-            <Input id="sides" name="sides" type="select">
+          <FormGroup className="input-container">
+            <Label for="sides" className="input-label">
+              Sides
+            </Label>
+            <Input id="sides" name="sides" type="select" className="input">
               <option value="one-sided">Single Sided</option>
               <option value="two-sided-long-edge">
-                Double Sided (Long Edge)
+                Long Edge Double Sided
               </option>
               <option value="two-sided-short-edge">
-                Double Sided (Short Edge)
+                Short Edge Double Sided
               </option>
             </Input>
           </FormGroup>
-          <FormGroup>
-            <Label for="colorMode">Color Mode</Label>
+          <FormGroup className="input-container">
+            <Label for="colorMode" className="input-label">
+              Color Mode
+            </Label>
             <Input
               id="colorMode"
               name="colorMode"
               type="select"
               value={colorMode}
               onChange={onColorChange}
+              className="input"
             >
               <option value="color">Color</option>
-              <option value="grayscale">Grayscale</option>
+              <option value="grayscale">Black + White</option>
             </Input>
           </FormGroup>
-          <FormGroup>
-            <Label for="copies">Copies</Label>
-            <Input
-              id="copies"
-              name="copies"
-              type="number"
-              defaultValue={1}
-              min={1}
-            />
+          <FormGroup className="input-container">
+            <Label for="copies" className="input-label">
+              Copies
+            </Label>
+
+            <div className="number-input input">
+              <Input
+                id="copies"
+                name="copies"
+                type="number"
+                value={copies}
+                min={1}
+                onChange={(e) => setCopies(Number(e.target.value))}
+                className="input"
+              />
+
+              <div className="number-controls">
+                <button type="button" onClick={() => setCopies((c) => c + 1)}>
+                  <span className="material-icons">keyboard_arrow_up</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setCopies((c) => Math.max(1, c - 1))}
+                >
+                  <span className="material-icons">keyboard_arrow_down</span>
+                </button>
+              </div>
+            </div>
           </FormGroup>
-          <FormGroup>
-            <Label for="pages">Page Range</Label>
+          <FormGroup className="input-container">
+            <Label for="pages" className="input-label">
+              Page Range
+            </Label>
             <Input
               id="pages"
               name="pages"
@@ -193,10 +266,13 @@ const Home = () => {
               invalid={pagesIncluded.text != pagesIncluded.validSet}
               onChange={onPagesIncludedChanged}
               placeholder="e.g. 1-5, 8, 11-13"
+              className="input"
             />
           </FormGroup>
 
-          <Button type="submit">Print</Button>
+          <Button type="submit" color="primary" className="w-100">
+            Print
+          </Button>
         </Form>
       </div>
     </div>

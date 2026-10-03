@@ -1,15 +1,32 @@
+#root {
+  --color-brand-orange: #ff9800;
+  --color-brand-primary: #b0197e;
+  --bs-body-bg: transparent;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* .dark-theme * {
+  --background: #222222;
+  --secondary: rgb(69, 69, 69);
+  --text: #fff;
+}
+.light-theme * {
+  --background: #eeeeee;
+  --secondary: #dddddd;
+  --text: #000;
+} */
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 .icon-button {
