@@ -14,7 +14,7 @@ import {
   FormText,
   Label,
 } from "reactstrap";
-import {useState, useRef} from "react";
+import { useState, useRef, useEffect } from "react";
 // import {Link} from "react-router-dom";
 // import Authenticating from "../callbacks/Authenticating";
 // import AuthenticationError from "../callbacks/AuthenticationError";
@@ -46,6 +46,20 @@ const Home = () => {
   const {fetch} = useOidcFetch();
   const [message, setMessage] = useState<SuccessReply | null>(null);
 
+  const [printers, setPrinters] = useState<string[]>([]);
+  const [printer, setPrinter] = useState("");
+
+  useEffect(() => {
+    fetch(`${apiPrefix}/printers`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((names: string[]) => {
+        setPrinters(names);
+        setPrinter(names[0] ?? "");
+      })
+  }, [fetch]);
+
   const pdfControls = useRef<PdfControls>({});
 
   const onSubmit = useConstCallback((event) => {
@@ -57,7 +71,7 @@ const Home = () => {
     console.log(file);
 
     fetch(
-      `${apiPrefix}/printers/${import.meta.env.VITE_PRINTER}/print?${new URLSearchParams(formData as any)}`,
+      `${apiPrefix}/printers/${encodeURIComponent(printer)}/print?${new URLSearchParams(formData as any)}`,
       {
         method: "POST",
         body: file,
@@ -137,6 +151,24 @@ const Home = () => {
           </Alert>
         )}
         <Form onSubmit={onSubmit}>
+          <FormGroup>
+            <Label for="printer">Printer</Label>
+            <Input
+              id="printer"
+              name="printer"
+              type="select"
+              value={printer}
+              onChange={(e) => setPrinter(e.target.value)}
+              disabled={printers.length === 0}
+              required
+            >
+              {printers.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
           <FormGroup>
             <Label for="file">File</Label>
             <Input
