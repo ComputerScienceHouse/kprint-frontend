@@ -178,7 +178,7 @@ const Home = () => {
               onChange={onFileSelected}
               required
             />
-            <FormText>Document you'd like to print</FormText>
+            <FormText>Document you'd like to print. (Max File Size: 25 MB)</FormText>
           </FormGroup>
           <FormGroup>
             <Label for="sides">Double-Sided</Label>
