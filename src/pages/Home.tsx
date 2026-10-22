@@ -4,9 +4,17 @@ import {
   // useOidcIdToken,
   useOidcFetch,
 } from "@axa-fr/react-oidc";
-import { useConstCallback } from "powerhooks";
-import { useRef, useState } from "react";
-import { Alert, Button, Form, FormGroup, Input, Label } from "reactstrap";
+import {useConstCallback} from "powerhooks";
+import {
+  Alert,
+  Form,
+  FormGroup,
+  Input,
+  Button,
+  FormText,
+  Label,
+} from "reactstrap";
+import { useState, useRef, useEffect } from "react";
 // import {Link} from "react-router-dom";
 // import Authenticating from "../callbacks/Authenticating";
 // import AuthenticationError from "../callbacks/AuthenticationError";
@@ -42,6 +50,20 @@ const Home = () => {
   const [pdfWidth, setPdfWidth] = useState(60);
   const splitterRef = useRef<HTMLDivElement | null>(null);
 
+  const [printers, setPrinters] = useState<string[]>([]);
+  const [printer, setPrinter] = useState("");
+
+  useEffect(() => {
+    fetch(`${apiPrefix}/printers`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((names: string[]) => {
+        setPrinters(names);
+        setPrinter(names[0] ?? "");
+      })
+  }, [fetch]);
+
   const pdfControls = useRef<PdfControls>({});
 
   const onSubmit = useConstCallback((event) => {
@@ -52,7 +74,7 @@ const Home = () => {
     formData.append("title", pdfControls.current?.documentTitle ?? file!!.name);
     console.log(file);
     fetch(
-      `${apiPrefix}/printers/${import.meta.env.VITE_PRINTER}/print?${new URLSearchParams(formData as any)}`,
+      `${apiPrefix}/printers/${encodeURIComponent(printer)}/print?${new URLSearchParams(formData as any)}`,
       {
         method: "POST",
         body: file,
@@ -168,31 +190,34 @@ const Home = () => {
           </Alert>
         )}
         <Form onSubmit={onSubmit}>
-          <h1 className="title">Print</h1>
-          <FormGroup className="input-container">
-            <Label for="file" className="input-label">
-              File
-            </Label>
-
-            <div className="custom-file-input">
-              <Label for="file" className="file-button">
-                Select File
-              </Label>
-
-              <span className="file-name">
-                {file ? file.name : "Select a file to print"}
-              </span>
-
-              <Input
-                id="file"
-                name="file"
-                type="file"
-                onChange={onFileSelected}
-                accept=".pdf"
-                className="file-input-hidden"
-                required
-              />
-            </div>
+          <FormGroup>
+            <Label for="printer">Printer</Label>
+            <Input
+              id="printer"
+              name="printer"
+              type="select"
+              value={printer}
+              onChange={(e) => setPrinter(e.target.value)}
+              disabled={printers.length === 0}
+              required
+            >
+              {printers.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
+          <FormGroup>
+            <Label for="file">File</Label>
+            <Input
+              id="file"
+              name="file"
+              type="file"
+              onChange={onFileSelected}
+              required
+            />
+            <FormText>Document you'd like to print. (Max File Size: 25 MB)</FormText>
           </FormGroup>
           <FormGroup className="input-container">
             <Label for="sides" className="input-label">
