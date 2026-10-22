@@ -5,8 +5,8 @@ import {
   useOidcFetch,
 } from "@axa-fr/react-oidc";
 import { useConstCallback } from "powerhooks";
-import { useRef, useState } from "react";
-import { Alert, Button, Form, FormGroup, Input, Label } from "reactstrap";
+import { useRef, useState, useEffect } from "react";
+import { Alert, Badge, Button, Form, FormGroup, Input, Label } from "reactstrap";
 // import {Link} from "react-router-dom";
 // import Authenticating from "../callbacks/Authenticating";
 // import AuthenticationError from "../callbacks/AuthenticationError";
@@ -28,6 +28,12 @@ type SuccessReply = {
   job_id: number | null;
 };
 
+type PrinterStatus = {
+  has_error: boolean;
+  printer: string;
+  reasons: string[];
+};
+
 const Home = () => {
   // important hooks
   // const { accessTokenPayload } = useOidcAccessToken()   // this contains the user info in raw json format
@@ -38,10 +44,34 @@ const Home = () => {
   const { fetch } = useOidcFetch();
   const [message, setMessage] = useState<SuccessReply | null>(null);
 
-  // Temp data to get input states for new printer selector
-  const [printers, _] = useState<string[]>(["Printer 1", "Printer 2"]);
+  const [printers, setPrinters] = useState<string[]>([]);
   const [printer, setPrinter] = useState("");
   const [copies, setCopies] = useState(1);
+
+  const [statuses, setStatuses] = useState<PrinterStatus[]>([]);
+  const status = statuses.find(
+    (s) => s.printer.split(".")[0].toLowerCase() === printer.toLowerCase(),
+  );
+
+  const [printError, setPrintError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch(`${apiPrefix}/printers`)
+      .then((res) => {
+        return res.json();
+      })
+      .then((names: string[]) => {
+        setPrinters(names);
+        setPrinter(names[0] ?? "");
+      });
+  }, [fetch]);
+
+  useEffect(() => {
+    fetch(`${apiPrefix}/printers/status`)
+      .then((res) => res.json())
+      .then(setStatuses)
+      .catch(() => {});
+  }, [fetch]);
 
   const [pdfWidth, setPdfWidth] = useState(60);
   const splitterRef = useRef<HTMLDivElement | null>(null);
@@ -56,7 +86,7 @@ const Home = () => {
     formData.append("title", pdfControls.current?.documentTitle ?? file!!.name);
     console.log(file);
     fetch(
-      `${apiPrefix}/printers/${import.meta.env.VITE_PRINTER}/print?${new URLSearchParams(formData as any)}`,
+            `${apiPrefix}/printers/${encodeURIComponent(printer)}/print?${new URLSearchParams(formData as any)}`,
       {
         method: "POST",
         body: file,
@@ -67,6 +97,7 @@ const Home = () => {
         setMessage(json);
       } else {
         console.log("failure", res, await res.text());
+        setPrintError("Printer has an error!");
       }
     });
   });
@@ -171,8 +202,8 @@ const Home = () => {
             <a href={message.job_link!!}>View Job {message.job_id!!}</a>
           </Alert>
         )}
+        {printError && <Alert color="danger">{printError}</Alert>}
         <Form onSubmit={onSubmit}>
-          <h1 className="title">Print</h1>
           <FormGroup className="input-container">
             <Label for="printer" className="input-label">
               Printer
@@ -194,7 +225,22 @@ const Home = () => {
               ))}
             </Input>
           </FormGroup>
-
+          {status && (
+            <FormGroup className="input-container">
+              <Label className="input-label">Printer Health</Label>
+              <div>
+                <Badge color={status.has_error ? "danger" : "success"}>
+                  {status.has_error ? "Not ready" : "Healthy"}
+                </Badge>{" "}
+                {status.has_error &&
+                  status.reasons.map((r) => (
+                    <Badge key={r} color="warning" className="me-1">
+                      {r}
+                    </Badge>
+                  ))}
+              </div>
+            </FormGroup>
+          )}
           <FormGroup className="input-container">
             <Label for="file" className="input-label">
               File

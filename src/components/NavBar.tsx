@@ -18,14 +18,15 @@ const NavBar: React.FunctionComponent = () => {
       data-bs-theme={darkMode ? "dark" : "light"}
     >
       <div className="container-lg">
-        <img
-          className="object-fit-contain ms-2 me-2"
-          height="32"
-          src="https://assets.csh.rit.edu/pubsite/csh_logo_square.svg"
-        ></img>
-        <a className="navbar-brand fs-4" href="#">
+        <NavLink to="/" className="navbar-brand d-flex align-items-center fs-4">
+          <img
+            className="object-fit-contain me-2"
+            height="32"
+            src="https://assets.csh.rit.edu/pubsite/csh_logo_square.svg"
+            alt="CSH logo"
+          />
           kPrint
-        </a>
+        </NavLink>
 
         <button
           className="navbar-toggler"
@@ -41,9 +42,6 @@ const NavBar: React.FunctionComponent = () => {
         <div className="collapse navbar-collapse text-light" id="kprint-navbar">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <NavLink to="/" className="nav-link px-2 link-light">
-                Home
-              </NavLink>
             </li>
           </ul>
           <ul className="nav navbar-nav ms-auto d-flex gap-3">
