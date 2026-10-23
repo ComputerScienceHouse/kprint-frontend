@@ -194,31 +194,40 @@ const Home = () => {
               ))}
             </Input>
           </FormGroup>
+
           <FormGroup className="input-container">
             <Label for="file" className="input-label">
               File
             </Label>
 
-            <div className="custom-file-input">
-              <Label for="file" className="file-button">
-                Select File
-              </Label>
+            <div className="file-selector-container">
+              <div className="custom-file-input">
+                <Label for="file" className="file-button">
+                  Select File
+                </Label>
 
-              <span className="file-name">
-                {file ? file.name : "Select a file to print"}
-              </span>
+                <span className="file-name">
+                  {file ? file.name : "Select a file to print"}
+                </span>
 
-              <Input
-                id="file"
-                name="file"
-                type="file"
-                onChange={onFileSelected}
-                accept=".pdf"
-                className="file-input-hidden"
-                required
-              />
+                <Input
+                  id="file"
+                  name="file"
+                  type="file"
+                  onChange={onFileSelected}
+                  accept=".pdf"
+                  className="file-input-hidden"
+                  aria-describedby="file-help"
+                  required
+                />
+              </div>
+
+              <small id="file-help" className="file-help">
+                PDF files only • Maximum file size: 25 MB
+              </small>
             </div>
           </FormGroup>
+
           <FormGroup className="input-container">
             <Label for="sides" className="input-label">
               Sides
