@@ -37,6 +37,10 @@ const Home = () => {
 
   const { fetch } = useOidcFetch();
   const [message, setMessage] = useState<SuccessReply | null>(null);
+
+  // Temp data to get input states for new printer selector
+  const [printers, _] = useState<string[]>(["Printer 1", "Printer 2"]);
+  const [printer, setPrinter] = useState("");
   const [copies, setCopies] = useState(1);
 
   const [pdfWidth, setPdfWidth] = useState(60);
@@ -170,6 +174,27 @@ const Home = () => {
         <Form onSubmit={onSubmit}>
           <h1 className="title">Print</h1>
           <FormGroup className="input-container">
+            <Label for="printer" className="input-label">
+              Printer
+            </Label>
+            <Input
+              id="printer"
+              name="printer"
+              type="select"
+              value={printer}
+              onChange={(e) => setPrinter(e.target.value)}
+              disabled={printers.length === 0}
+              required
+              className="input-select-style-fix"
+            >
+              {printers.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
+          <FormGroup className="input-container">
             <Label for="file" className="input-label">
               File
             </Label>
@@ -198,7 +223,12 @@ const Home = () => {
             <Label for="sides" className="input-label">
               Sides
             </Label>
-            <Input id="sides" name="sides" type="select" className="input">
+            <Input
+              id="sides"
+              name="sides"
+              type="select"
+              className="input-select-style-fix"
+            >
               <option value="one-sided">Single Sided</option>
               <option value="two-sided-long-edge">
                 Long Edge Double Sided
@@ -218,7 +248,7 @@ const Home = () => {
               type="select"
               value={colorMode}
               onChange={onColorChange}
-              className="input"
+              className="input-select-style-fix"
             >
               <option value="color">Color</option>
               <option value="grayscale">Black + White</option>
@@ -229,30 +259,14 @@ const Home = () => {
               Copies
             </Label>
 
-            <div className="number-input input">
-              <Input
-                id="copies"
-                name="copies"
-                type="number"
-                value={copies}
-                min={1}
-                onChange={(e) => setCopies(Number(e.target.value))}
-                className="input"
-              />
-
-              <div className="number-controls">
-                <button type="button" onClick={() => setCopies((c) => c + 1)}>
-                  <span className="material-icons">keyboard_arrow_up</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setCopies((c) => Math.max(1, c - 1))}
-                >
-                  <span className="material-icons">keyboard_arrow_down</span>
-                </button>
-              </div>
-            </div>
+            <Input
+              id="copies"
+              name="copies"
+              type="number"
+              value={copies}
+              min={1}
+              onChange={(e) => setCopies(Number(e.target.value))}
+            />
           </FormGroup>
           <FormGroup className="input-container">
             <Label for="pages" className="input-label">
@@ -266,7 +280,6 @@ const Home = () => {
               invalid={pagesIncluded.text != pagesIncluded.validSet}
               onChange={onPagesIncludedChanged}
               placeholder="e.g. 1-5, 8, 11-13"
-              className="input"
             />
           </FormGroup>
 

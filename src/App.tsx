@@ -1,5 +1,4 @@
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-// @ts-expect-error The package exposes CSS without TypeScript declarations.
+import "bootstrap";
 import "csh-material-bootstrap/css";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import PageContainer from "./containers/PageContainer";

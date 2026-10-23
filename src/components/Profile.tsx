@@ -37,20 +37,20 @@ const Profile: React.FunctionComponent = () => {
             width={32}
             height={32}
           />{" "}
-          Testing Tester
-          <span className="caret"></span>
+          ({userInfo.preferred_username}) <span className="caret"></span>
         </a>
         <div className="dropdown-menu" aria-labelledby="user02">
-          <a className="dropdown-item" href="#">
-            Profile
-          </a>
-          <a className="dropdown-item" href="#">
-            Settings
+          <a className="dropdown-item" href="https://members.csh.rit.edu">
+            Members
           </a>
           <div className="dropdown-divider"></div>
-          <a className="dropdown-item" href="#">
+          <button
+            className="dropdown-item"
+            type="button"
+            onClick={() => logout()}
+          >
             Logout
-          </a>
+          </button>
         </div>
       </li>
     </ul>
