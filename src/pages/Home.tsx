@@ -215,7 +215,6 @@ const Home = () => {
                   name="file"
                   type="file"
                   onChange={onFileSelected}
-                  accept=".pdf"
                   className="file-input-hidden"
                   aria-describedby="file-help"
                   required
@@ -223,7 +222,7 @@ const Home = () => {
               </div>
 
               <small id="file-help" className="file-help">
-                PDF files only • Maximum file size: 25 MB
+                Maximum file size: 25 MB
               </small>
             </div>
           </FormGroup>
